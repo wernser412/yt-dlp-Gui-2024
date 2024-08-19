@@ -1,5 +1,7 @@
 # Video Downloader con yt-dlp y PowerShell
 
+![Interfaz Gráfica del Script](https://raw.githubusercontent.com/wernser412/yt-dlp-Gui-2024/main/GUI.jpg)
+
 ## Descripción
 
 Este script en PowerShell es una herramienta interactiva para descargar videos desde una URL utilizando `yt-dlp`. Permite al usuario seleccionar el formato de video/audio deseado y verifica que las dependencias necesarias (`yt-dlp` y `ffmpeg`) estén correctamente instaladas en el sistema. Además, incluye la opción para instalar `ffmpeg` automáticamente si no está presente.
@@ -45,4 +47,3 @@ Este script en PowerShell es una herramienta interactiva para descargar videos d
 
 - El script requiere una conexión a internet para descargar `ffmpeg` si no está instalado.
 - Asegúrate de que `7-Zip` esté instalado y accesible en la ruta predeterminada (`C:\Program Files\7-Zip\7z.exe`).
-
