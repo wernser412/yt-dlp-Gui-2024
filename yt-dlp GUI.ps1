@@ -1,52 +1,205 @@
 function Download-Video {
+    $url = ""
+    $format = ""
+    $subtitlesOption = ""
+
+    while ($true) {
+        Clear-Host
+        Write-Host "===========================" -ForegroundColor Green
+        Write-Host "   Agregar Formato y Descargar Video  " -ForegroundColor Green
+        Write-Host " Codigo:  " -NoNewline
+
+        # Verificar si hay URL y formato antes de mostrar el comando
+        if ($url -and $format) {
+            Write-Host "yt-dlp.exe -f" -ForegroundColor Cyan -NoNewline
+            Write-Host " $format" -ForegroundColor Yellow -NoNewline
+            Write-Host " $url" -ForegroundColor Yellow -NoNewline
+            if ($subtitlesOption) {
+                Write-Host " $subtitlesOption" -ForegroundColor Magenta -NoNewline
+            }
+        } else {
+            Write-Host "(Pendiente de ingresar datos)" -ForegroundColor DarkGray
+        }
+
+        Write-Host ""
+        Write-Host "===========================" -ForegroundColor Green
+        Write-Host "1. Ingresar la URL del video y formato" -ForegroundColor Yellow
+        Write-Host "2. Ingresar Subtitulo del video" -ForegroundColor Magenta
+        Write-Host "3. Iniciar descarga" -ForegroundColor Yellow
+        Write-Host "4. Atras" -ForegroundColor Yellow
+        Write-Host "===========================" -ForegroundColor Green
+        Write-Host "Selecciona una opcion:" -ForegroundColor Yellow
+        $option = Read-Host
+
+        switch ($option) {
+            "1" {
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "    Formatos Disponibles    " -ForegroundColor Green
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "Ingresa la URL del video:" -ForegroundColor Yellow
+                $url = Read-Host
+
+                if ([string]::IsNullOrEmpty($url)) {
+                    Write-Host "No se ingreso ninguna URL, intenta de nuevo." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                Write-Host "URL ingresada: " -ForegroundColor Green -NoNewline
+                Write-Host "$url" -ForegroundColor Yellow
+
+                try {
+                    yt-dlp.exe -F $url
+                } catch {
+                    Write-Host "Hubo un error al intentar recuperar los formatos. Por favor, verifica la URL o la conexion a Internet." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                Write-Host "Ingresa el nombre completo del formato o deja en blanco para usar el mejor video y audio combinados:" -ForegroundColor Yellow
+                $format = Read-Host
+
+                if ([string]::IsNullOrEmpty($format)) {
+                    $format = "bestvideo+bestaudio"
+                }
+
+                Write-Host "Formato seleccionado: " -ForegroundColor Green -NoNewline
+                Write-Host "$format" -ForegroundColor Yellow
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
+            "2" {
+                if (-not $url) {
+                    Write-Host "No se ha ingresado ninguna URL. Selecciona la opcion 1 primero." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                try {
+                    Clear-Host
+                    Write-Host "===========================" -ForegroundColor Green
+                    Write-Host "   Subtitulos Disponibles   " -ForegroundColor Magenta
+                    Write-Host "===========================" -ForegroundColor Green
+                    yt-dlp.exe --list-subs $url
+                } catch {
+                    Write-Host "Hubo un error al intentar recuperar los subtitulos disponibles. Verifica la URL o la conexion a Internet." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                Write-Host "Ingresa el codigo del idioma de los subtitulos (por ejemplo, 'es' para espanol, 'en' para ingles) o selecciona 1 para volver:" -ForegroundColor Magenta
+                $subOption = Read-Host
+
+                if ($subOption -eq "1") {
+                    continue
+                }
+
+                if (![string]::IsNullOrEmpty($subOption)) {
+                    $subtitlesOption = "--write-subs --embed-subs --sub-lang $subOption"
+                    Write-Host "Subtitulo seleccionado: " -ForegroundColor Green -NoNewline
+                    Write-Host "$subOption" -ForegroundColor Magenta
+                }
+
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
+            "3" {
+                if (-not $url) {
+                    Write-Host "No se ha ingresado ninguna URL. Selecciona la opcion 1 primero." -ForegroundColor Red
+                    continue
+                }
+
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "  Ejecutando : el codigo dinamico" -ForegroundColor Cyan
+                Write-Host "===========================" -ForegroundColor Green
+
+                try {
+                    $completeCommand = "yt-dlp.exe -f $format $subtitlesOption $url"
+                    Write-Host "Comando ejecutado: " -ForegroundColor Green
+                    Write-Host "$completeCommand" -ForegroundColor Cyan
+                    Invoke-Expression $completeCommand
+                    Write-Host "Descarga completada." -ForegroundColor Green
+                } catch {
+                    Write-Host "Hubo un error al descargar el video. Por favor, verifica el formato seleccionado y vuelve a intentarlo." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                break
+            }
+            "4" {
+                Show-Menu
+                break
+            }
+            default {
+                Write-Host "Opcion no valida. Intentalo de nuevo." -ForegroundColor Red
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
+        }
+    }
+}
+
+function Install-Ffmpeg {
     Clear-Host
-    Write-Host "==========================="
-    Write-Host "   Agregar Formato y Descargar Video  "
-    Write-Host "==========================="
-    $url = Read-Host "Ingresa la URL del video"
+    Write-Host "===========================" -ForegroundColor Green
+    Write-Host "      Instalando ffmpeg     " -ForegroundColor Green
+    Write-Host "===========================" -ForegroundColor Green
+    $downloadUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+    $destinationPath = "$([environment]::GetFolderPath('MyDocuments'))\ffmpeg-release-essentials.zip"
+    $extractPath = "$([environment]::GetFolderPath('MyDocuments'))\ffmpeg"
 
-    if ([string]::IsNullOrEmpty($url)) {
-        Write-Host "No se ingreso ninguna URL, intenta de nuevo."
-        Write-Host "Presiona cualquier tecla para continuar..."
-        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        Download-Video
-    }
-
-    Write-Host "URL ingresada: $url"
-
-    Clear-Host
-    Write-Host "==========================="
-    Write-Host "    Formatos Disponibles    "
-    Write-Host "==========================="
-
-    # Ejecución del comando yt-dlp para mostrar formatos
+    Write-Host "Descargando ffmpeg desde $downloadUrl ..." -ForegroundColor Yellow
     try {
-        yt-dlp.exe -F $url
-    } catch {
-        Write-Host "Hubo un error al intentar recuperar los formatos. Por favor, verifica la URL o la conexion a Internet."
-        Write-Host "Presiona cualquier tecla para continuar..."
-        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        Show-Menu
-    }
-
-    $format = Read-Host "Ingresa el nombre completo del formato o deja en blanco para usar el mejor video y audio combinados"
-
-    # Si el formato está en blanco, usar bestvideo+bestaudio
-    if ([string]::IsNullOrEmpty($format)) {
-        $format = "bestvideo+bestaudio"
-    }
-
-    # Descargar el video usando el formato especificado o la combinación automática
-    try {
-        yt-dlp.exe -f $format $url
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath -UseBasicParsing -TimeoutSec 3600
         Write-Host "Descarga completada." -ForegroundColor Green
     } catch {
-        Write-Host "Hubo un error al descargar el video. Por favor, verifica el formato seleccionado y vuelve a intentarlo."
-        Write-Host "Presiona cualquier tecla para continuar..."
+        Write-Host "Error durante la descarga: $_" -ForegroundColor Red
+        Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
         $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Show-Menu
+        return
     }
-    
-    Write-Host "Presiona cualquier tecla para continuar..."
+
+    if (-not (Test-Path $destinationPath) -or (Get-Item $destinationPath).Length -eq 0) {
+        Write-Host "Error: La descarga fallo o el archivo esta vacio." -ForegroundColor Red
+        Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Show-Menu
+        return
+    }
+
+    Write-Host "Descomprimiendo ffmpeg en $extractPath ..."  -ForegroundColor Green
+    Expand-Archive -Path $destinationPath -DestinationPath $extractPath -Force
+
+    $binPath = Get-ChildItem -Path "$extractPath\ffmpeg-*" -Recurse -Directory | Where-Object { $_.Name -eq "bin" }
+
+    if (-not $binPath) {
+        Write-Host "Error: No se encontro la carpeta esperada despues de la descompresion." -ForegroundColor Red
+        Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Show-Menu
+        return
+    }
+
+    try {
+        $env:Path += ";$($binPath.FullName)"
+        [System.Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::User)
+        Write-Host "ffmpeg instalado y anadido al PATH del sistema." -ForegroundColor Green
+    } catch {
+        Write-Host "Hubo un error al anadir ffmpeg al PATH: $_" -ForegroundColor Red
+    }
+
+    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
     $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
     Show-Menu
 }
@@ -54,158 +207,58 @@ function Download-Video {
 function Show-Menu {
     while ($true) {
         Clear-Host
-        Write-Host "==========================="
-        Write-Host "          MENU             "
+        Write-Host "===========================" -ForegroundColor Green
+        Write-Host "   Menu Principal           " -ForegroundColor Green
+        Write-Host "===========================" -ForegroundColor Green
 
-        # Verificar la existencia de yt-dlp.exe y obtener la versión
-        $ytDlpPath = Get-Command yt-dlp.exe -ErrorAction SilentlyContinue
-        if ($null -eq $ytDlpPath) {
-            Write-Host "yt-dlp.exe no instalado" -ForegroundColor Red
-        } else {
-            $ytDlpVersion = & yt-dlp.exe --version
-            Write-Host "yt-dlp.exe = $ytDlpVersion" -ForegroundColor Green
+        # Mostrar versión de yt-dlp
+        try {
+            $ytDlpVersion = (yt-dlp --version 2>$null).ToString()
+            Write-Host "yt-dlp version: $ytDlpVersion" -ForegroundColor Cyan
+        } catch {
+            Write-Host "yt-dlp no esta instalado o no se pudo verificar la version." -ForegroundColor Red
         }
 
-        # Verificar la existencia de ffmpeg y obtener la versión
-        $ffmpegPath = Get-Command ffmpeg -ErrorAction SilentlyContinue
-        if ($null -eq $ffmpegPath) {
-            Write-Host "ffmpeg no instalado" -ForegroundColor Red
-        } else {
-            $ffmpegVersion = & ffmpeg -version | Select-String "ffmpeg version" | ForEach-Object { $_.Line }
-            $ffmpegVersionNumber = $ffmpegVersion -replace "^ffmpeg version ([\d\.]+).*", '$1'
-            Write-Host "ffmpeg = $ffmpegVersionNumber" -ForegroundColor Green
+        # Mostrar versión de ffmpeg en el formato solicitado
+        try {
+            $ffmpegVersion = (ffmpeg -version 2>$null | Select-String "ffmpeg version").ToString()
+            if ($ffmpegVersion) {
+                # Extraer solo el número de versión de ffmpeg, eliminando cualquier texto adicional
+                $ffmpegVersion = $ffmpegVersion -replace "^ffmpeg version ([\d\.]+).*", '$1'
+                Write-Host "ffmpeg version: $ffmpegVersion" -ForegroundColor Cyan
+            } else {
+                Write-Host "ffmpeg no esta instalado o no se pudo verificar la version." -ForegroundColor Red
+            }
+        } catch {
+            Write-Host "ffmpeg no esta instalado o no se pudo verificar la version." -ForegroundColor Red
         }
 
-        Write-Host "==========================="
-        Write-Host "1. Descargar video"
-        Write-Host "2. Verificar yt-dlp.exe"
-        Write-Host "3. Verificar ffmpeg"
-        Write-Host "4. Instalar ffmpeg"
-        Write-Host "5. Salir"
-        Write-Host "==========================="
-        $option = Read-Host "Selecciona una opcion"
+        Write-Host "===========================" -ForegroundColor Green
+        Write-Host "1. Descargar video" -ForegroundColor Yellow
+        Write-Host "2. Instalar ffmpeg" -ForegroundColor Yellow
+        Write-Host "3. Salir" -ForegroundColor Yellow
+        Write-Host "===========================" -ForegroundColor Green
+        Write-Host "Selecciona una opcion:" -ForegroundColor Yellow
+        $option = Read-Host
 
         switch ($option) {
-            "1" { Download-Video }
-            "2" { Check-YtDlp }
-            "3" { Check-Ffmpeg }
-            "4" { Install-Ffmpeg }
-            "5" { Exit-Script }
-            default { Write-Host "Opcion no valida. Intentalo de nuevo."; Write-Host "Presiona cualquier tecla para continuar..."; $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") }
+            "1" {
+                Download-Video
+            }
+            "2" {
+                Install-Ffmpeg
+            }
+            "3" {
+                Exit
+            }
+            default {
+                Write-Host "Opcion no valida. Intentalo de nuevo." -ForegroundColor Red
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
         }
     }
 }
 
-function Check-Ffmpeg {
-    Clear-Host
-    Write-Host "==========================="
-    Write-Host "        Verificar ffmpeg    "
-    Write-Host "==========================="
-    $ffmpegPath = Get-Command ffmpeg -ErrorAction SilentlyContinue
-    if ($null -eq $ffmpegPath) {
-        Write-Host "ffmpeg no esta instalado." -ForegroundColor Red
-    } else {
-        Write-Host "ffmpeg esta instalado." -ForegroundColor Green
-        ffmpeg -version
-    }
-    Write-Host "Presiona cualquier tecla para continuar..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-    Show-Menu
-}
-
-function Check-YtDlp {
-    Clear-Host
-    Write-Host "==========================="
-    Write-Host "      Verificar yt-dlp.exe  "
-    Write-Host "==========================="
-    $ytDlpPath = Get-Command yt-dlp.exe -ErrorAction SilentlyContinue
-    if ($null -eq $ytDlpPath) {
-        Write-Host "yt-dlp.exe no esta instalado." -ForegroundColor Red
-    } else {
-        Write-Host "yt-dlp.exe esta instalado." -ForegroundColor Green
-        yt-dlp.exe --version
-    }
-    Write-Host "Presiona cualquier tecla para continuar..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-    Show-Menu
-}
-
-function Install-Ffmpeg {
-    Clear-Host
-    Write-Host "==========================="
-    Write-Host "      Instalando ffmpeg     "
-    Write-Host "==========================="
-    $downloadUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full.7z"
-    $destinationPath = "$([environment]::GetFolderPath('MyDocuments'))\ffmpeg-release-full.7z"
-    $extractPath = "$([environment]::GetFolderPath('MyDocuments'))\ffmpeg"
-
-    # Descargar ffmpeg manualmente con simulación de progreso
-    Write-Host "Descargando ffmpeg desde $downloadUrl ..."
-    try {
-        $response = Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath -UseBasicParsing -TimeoutSec 3600
-        Write-Host "Descarga completada." -ForegroundColor Green
-    } catch {
-        Write-Host "Error durante la descarga: $_" -ForegroundColor Red
-        Write-Host "Presiona cualquier tecla para continuar..."
-        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        Show-Menu
-        return
-    }
-
-    # Verificar si el archivo se ha descargado correctamente
-    if (-not (Test-Path $destinationPath) -or (Get-Item $destinationPath).Length -eq 0) {
-        Write-Host "Error: La descarga fallo o el archivo esta vacio." -ForegroundColor Red
-        Write-Host "Presiona cualquier tecla para continuar..."
-        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        Show-Menu
-        return
-    }
-
-    # Verificar si 7z.exe esta instalado
-    $sevenZipPath = "C:\Program Files\7-Zip\7z.exe"
-    if (-not (Test-Path $sevenZipPath)) {
-        Write-Host "7-Zip no esta instalado o no se encontro en la ruta predeterminada. Instalalo antes de continuar." -ForegroundColor Red
-        Write-Host "Presiona cualquier tecla para continuar..."
-        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        Show-Menu
-        return
-    }
-
-    # Descomprimir ffmpeg usando 7z.exe
-    Write-Host "Descomprimiendo ffmpeg en $extractPath ..."  -ForegroundColor Green
-    $command = "& `"$sevenZipPath`" x `"$destinationPath`" -o`"$extractPath`" -y"
-    Invoke-Expression $command
-
-    # Verificar si la descompresión fue exitosa
-    $binPath = Get-ChildItem -Path $extractPath -Recurse -Directory | Where-Object { $_.Name -eq "bin" }
-
-    if (-not $binPath) {
-        Write-Host "Error: No se encontro la carpeta esperada después de la descompresion." -ForegroundColor Red
-        Write-Host "Presiona cualquier tecla para continuar..."
-        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-        Show-Menu
-        return
-    }
-
-    # Agregar ffmpeg al PATH
-    $ffmpegBinPath = $binPath.FullName
-    if ($env:Path -notlike "*$ffmpegBinPath*") {
-        Write-Host "Agregando ffmpeg al PATH ..."  -ForegroundColor Green
-        [Environment]::SetEnvironmentVariable("Path", "$env:Path;$ffmpegBinPath", [EnvironmentVariableTarget]::User)
-        Write-Host "ffmpeg se ha agregado al PATH."  -ForegroundColor Green
-    } else {
-        Write-Host "ffmpeg ya esta en el PATH."  -ForegroundColor Green
-    }
-
-    Write-Host "Instalacion completada. Cerrar el script" -ForegroundColor Green
-    Write-Host "Presiona cualquier tecla para continuar..."
-    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-	Exit
-}
-
-function Exit-Script {
-    Exit  # Cierra el script inmediatamente
-}
-
-# Inicia el menú principal
+# Mostrar el menú principal
 Show-Menu
