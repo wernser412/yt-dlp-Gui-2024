@@ -1,5 +1,7 @@
 # Video Downloader con yt-dlp y PowerShell
 
+**Última Actualización:** 02 de septiembre de 2024
+
 ![Interfaz Gráfica del Script](https://raw.githubusercontent.com/wernser412/yt-dlp-Gui-2024/main/GUI.jpg)
 
 ## Descripción
@@ -20,21 +22,6 @@ Este script en PowerShell es una herramienta interactiva para descargar videos d
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) instalado.
 - [7-Zip](https://www.7-zip.org/) para descomprimir `ffmpeg`.
 
-## Instalación
-
-1. Clona este repositorio:
-    ```bash
-    git clone https://github.com/!wernser412!/nombre-del-repositorio.git
-    ```
-
-2. Asegúrate de tener `yt-dlp` instalado en tu sistema:
-    - Puedes descargarlo desde [aquí](https://github.com/yt-dlp/yt-dlp#installation).
-
-3. Ejecuta el script en PowerShell:
-    ```bash
-    .\nombre-del-script.ps1
-    ```
-
 ## Uso
 
 1. Ejecuta el script.
@@ -47,3 +34,4 @@ Este script en PowerShell es una herramienta interactiva para descargar videos d
 
 - El script requiere una conexión a internet para descargar `ffmpeg` si no está instalado.
 - Asegúrate de que `7-Zip` esté instalado y accesible en la ruta predeterminada (`C:\Program Files\7-Zip\7z.exe`).
+
