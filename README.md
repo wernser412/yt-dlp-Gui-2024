@@ -24,7 +24,7 @@ Este script en PowerShell es una herramienta interactiva para descargar videos d
 
 ## Uso
 
-1. Ejecuta el script.
+1. Ejecuta el script (yt-dlp GUI.bat).
 2. Selecciona la opción deseada en el menú.
 3. Ingresa la URL del video cuando se te pida.
 4. Selecciona el formato o usa la opción predeterminada.
