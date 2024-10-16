@@ -2,7 +2,7 @@
 
 **Última Actualización:** 15 de octubre de 2024
 
-![Interfaz Gráfica del Script](GUI.jpg)
+![Interfaz Gráfica del Script](GUI.png)
 
 ## Descripción
 
