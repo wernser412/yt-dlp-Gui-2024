@@ -1,8 +1,8 @@
 # Video Downloader con yt-dlp y PowerShell
 
-**Última Actualización:** 02 de septiembre de 2024
+**Última Actualización:** 15 de octubre de 2024
 
-![Interfaz Gráfica del Script](https://raw.githubusercontent.com/wernser412/yt-dlp-Gui-2024/main/GUI.jpg)
+![Interfaz Gráfica del Script](GUI.jpg)
 
 ## Descripción
 
