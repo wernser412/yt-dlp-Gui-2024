@@ -1,6 +1,6 @@
 # Video Downloader con yt-dlp y PowerShell
 
-**Última Actualización:** 15 de octubre de 2024
+**Última Actualización:** 30 de octubre de 2024
 
 ![Interfaz Gráfica del Script](GUI.png)
 
