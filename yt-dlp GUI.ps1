@@ -199,6 +199,61 @@ function Download-Video {
 }
 
 
+function Install-Ffmpeg {
+    Clear-Host
+    Write-Host "===========================" -ForegroundColor Green
+    Write-Host "      Instalando ffmpeg     " -ForegroundColor Green
+    Write-Host "===========================" -ForegroundColor Green
+    $downloadUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+    $destinationPath = "$([environment]::GetFolderPath('MyDocuments'))\ffmpeg-release-essentials.zip"
+    $extractPath = "$([environment]::GetFolderPath('MyDocuments'))\ffmpeg"
+
+    Write-Host "Descargando ffmpeg desde $downloadUrl ..." -ForegroundColor Yellow
+    try {
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $destinationPath -UseBasicParsing -TimeoutSec 3600
+        Write-Host "Descarga completada." -ForegroundColor Green
+    } catch {
+        Write-Host "Error durante la descarga: $_" -ForegroundColor Red
+        Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Show-Menu
+        return
+    }
+
+    if (-not (Test-Path $destinationPath) -or (Get-Item $destinationPath).Length -eq 0) {
+        Write-Host "Error: La descarga fallo o el archivo esta vacio." -ForegroundColor Red
+        Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Show-Menu
+        return
+    }
+
+    Write-Host "Descomprimiendo ffmpeg en $extractPath ..."  -ForegroundColor Green
+    Expand-Archive -Path $destinationPath -DestinationPath $extractPath -Force
+
+    $binPath = Get-ChildItem -Path "$extractPath\ffmpeg-*" -Recurse -Directory | Where-Object { $_.Name -eq "bin" }
+
+    if (-not $binPath) {
+        Write-Host "Error: No se encontro la carpeta esperada despues de la descompresion." -ForegroundColor Red
+        Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+        $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        Show-Menu
+        return
+    }
+
+    try {
+        $env:Path += ";$($binPath.FullName)"
+        [System.Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::User)
+        Write-Host "ffmpeg instalado y anadido al PATH del sistema." -ForegroundColor Green
+    } catch {
+        Write-Host "Hubo un error al anadir ffmpeg al PATH: $_" -ForegroundColor Red
+    }
+
+    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    Show-Menu
+}
+
 
 function Show-Menu {
     while ($true) {
