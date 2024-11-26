@@ -1,154 +1,3 @@
-function Download-Video {
-    $url = ""
-    $format = ""
-    $subtitlesOption = ""
-
-    while ($true) {
-        Clear-Host
-        Write-Host "===========================" -ForegroundColor Green
-        Write-Host "   Agregar Formato y Descargar Video  " -ForegroundColor Green
-        Write-Host " Codigo:  " -NoNewline
-
-        # Verificar si hay URL y formato antes de mostrar el comando
-        if ($url -and $format) {
-            Write-Host "yt-dlp.exe -f" -ForegroundColor Cyan -NoNewline
-            Write-Host " $format" -ForegroundColor Yellow -NoNewline
-            Write-Host " $url" -ForegroundColor Yellow -NoNewline
-            if ($subtitlesOption) {
-                Write-Host " $subtitlesOption" -ForegroundColor Magenta -NoNewline
-            }
-        } else {
-            Write-Host "(Pendiente de ingresar datos)" -ForegroundColor DarkGray
-        }
-
-        Write-Host ""
-        Write-Host "===========================" -ForegroundColor Green
-        Write-Host "1. Ingresar la URL del video y formato" -ForegroundColor Yellow
-        Write-Host "2. Ingresar Subtitulo del video" -ForegroundColor Magenta
-        Write-Host "3. Iniciar descarga" -ForegroundColor Yellow
-        Write-Host "4. Atras" -ForegroundColor Yellow
-        Write-Host "===========================" -ForegroundColor Green
-        Write-Host "Selecciona una opcion:" -ForegroundColor Yellow
-        $option = Read-Host
-
-        switch ($option) {
-            "1" {
-                Clear-Host
-                Write-Host "===========================" -ForegroundColor Green
-                Write-Host "    Formatos Disponibles    " -ForegroundColor Green
-                Write-Host "===========================" -ForegroundColor Green
-                Write-Host "Ingresa la URL del video:" -ForegroundColor Yellow
-                $url = Read-Host
-
-                if ([string]::IsNullOrEmpty($url)) {
-                    Write-Host "No se ingreso ninguna URL, intenta de nuevo." -ForegroundColor Red
-                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-                    continue
-                }
-
-                Write-Host "URL ingresada: " -ForegroundColor Green -NoNewline
-                Write-Host "$url" -ForegroundColor Yellow
-
-                try {
-                    yt-dlp.exe -F $url
-                } catch {
-                    Write-Host "Hubo un error al intentar recuperar los formatos. Por favor, verifica la URL o la conexion a Internet." -ForegroundColor Red
-                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-                    continue
-                }
-
-                Write-Host "Ingresa el nombre completo del formato o deja en blanco para usar el mejor video y audio combinados:" -ForegroundColor Yellow
-                $format = Read-Host
-
-                if ([string]::IsNullOrEmpty($format)) {
-                    $format = "bestvideo+bestaudio"
-                }
-
-                Write-Host "Formato seleccionado: " -ForegroundColor Green -NoNewline
-                Write-Host "$format" -ForegroundColor Yellow
-                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-            }
-            "2" {
-                if (-not $url) {
-                    Write-Host "No se ha ingresado ninguna URL. Selecciona la opcion 1 primero." -ForegroundColor Red
-                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-                    continue
-                }
-
-                try {
-                    Clear-Host
-                    Write-Host "===========================" -ForegroundColor Green
-                    Write-Host "   Subtitulos Disponibles   " -ForegroundColor Magenta
-                    Write-Host "===========================" -ForegroundColor Green
-                    yt-dlp.exe --list-subs $url
-                } catch {
-                    Write-Host "Hubo un error al intentar recuperar los subtitulos disponibles. Verifica la URL o la conexion a Internet." -ForegroundColor Red
-                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-                    continue
-                }
-
-                Write-Host "Ingresa el codigo del idioma de los subtitulos (por ejemplo, 'es' para espanol, 'en' para ingles) o selecciona 1 para volver:" -ForegroundColor Magenta
-                $subOption = Read-Host
-
-                if ($subOption -eq "1") {
-                    continue
-                }
-
-                if (![string]::IsNullOrEmpty($subOption)) {
-                    $subtitlesOption = "--write-subs --embed-subs --sub-lang $subOption"
-                    Write-Host "Subtitulo seleccionado: " -ForegroundColor Green -NoNewline
-                    Write-Host "$subOption" -ForegroundColor Magenta
-                }
-
-                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-            }
-            "3" {
-                if (-not $url) {
-                    Write-Host "No se ha ingresado ninguna URL. Selecciona la opcion 1 primero." -ForegroundColor Red
-                    continue
-                }
-
-                Clear-Host
-                Write-Host "===========================" -ForegroundColor Green
-                Write-Host "  Ejecutando : el codigo dinamico" -ForegroundColor Cyan
-                Write-Host "===========================" -ForegroundColor Green
-
-                try {
-                    $completeCommand = "yt-dlp.exe -f $format $subtitlesOption $url"
-                    Write-Host "Comando ejecutado: " -ForegroundColor Green
-                    Write-Host "$completeCommand" -ForegroundColor Cyan
-                    Invoke-Expression $completeCommand
-                    Write-Host "Descarga completada." -ForegroundColor Green
-                } catch {
-                    Write-Host "Hubo un error al descargar el video. Por favor, verifica el formato seleccionado y vuelve a intentarlo." -ForegroundColor Red
-                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-                    continue
-                }
-
-                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-                break
-            }
-            "4" {
-                Show-Menu
-                break
-            }
-            default {
-                Write-Host "Opcion no valida. Intentalo de nuevo." -ForegroundColor Red
-                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
-            }
-        }
-    }
-}
-
 function Install-Ffmpeg {
     Clear-Host
     Write-Host "===========================" -ForegroundColor Green
@@ -204,11 +53,24 @@ function Install-Ffmpeg {
     Show-Menu
 }
 
+
 function Show-Menu {
+    $url = ""
+    $format = ""
+    $subtitlesOption = ""
+    $dynamicCommand = "(Pendiente)"
+
     while ($true) {
+        # Actualizar el código dinámico basado en las opciones ingresadas
+        if ($url -and $format) {
+            $dynamicCommand = "yt-dlp.exe -f $format $subtitlesOption $url"
+        } else {
+            $dynamicCommand = "(Pendiente)"
+        }
+
         Clear-Host
         Write-Host "===========================" -ForegroundColor Green
-        Write-Host "   Menu Principal           " -ForegroundColor Green
+        Write-Host "        Menu Principal       " -ForegroundColor Green
         Write-Host "===========================" -ForegroundColor Green
 
         # Mostrar versión de yt-dlp
@@ -219,11 +81,10 @@ function Show-Menu {
             Write-Host "yt-dlp no esta instalado o no se pudo verificar la version." -ForegroundColor Red
         }
 
-        # Mostrar versión de ffmpeg en el formato solicitado
+        # Mostrar versión de ffmpeg
         try {
             $ffmpegVersion = (ffmpeg -version 2>$null | Select-String "ffmpeg version").ToString()
             if ($ffmpegVersion) {
-                # Extraer solo el número de versión de ffmpeg, eliminando cualquier texto adicional
                 $ffmpegVersion = $ffmpegVersion -replace "^ffmpeg version ([\d\.]+).*", '$1'
                 Write-Host "ffmpeg version: $ffmpegVersion" -ForegroundColor Cyan
             } else {
@@ -234,25 +95,150 @@ function Show-Menu {
         }
 
         Write-Host "===========================" -ForegroundColor Green
-        Write-Host "1. Descargar video" -ForegroundColor Yellow
-        Write-Host "2. Instalar ffmpeg" -ForegroundColor Yellow
-        Write-Host "3. Salir" -ForegroundColor Yellow
+        Write-Host "Codigo dinamico: " -ForegroundColor Yellow -NoNewline
+        Write-Host "$dynamicCommand" -ForegroundColor Cyan
+        Write-Host "===========================" -ForegroundColor Green
+
+        Write-Host "1. Ingresar la URL del video: " -ForegroundColor Yellow -NoNewline
+        if ($url) {
+            Write-Host "$url" -ForegroundColor Cyan
+        } else {
+            Write-Host "(Pendiente)" -ForegroundColor DarkGray
+        }
+
+        Write-Host "2. Ingresar formato: " -ForegroundColor Yellow -NoNewline
+        if ($format) {
+            Write-Host "$format" -ForegroundColor Cyan
+        } else {
+            Write-Host "(Pendiente)" -ForegroundColor DarkGray
+        }
+
+        Write-Host "3. Ingresar subtitulo del video: " -ForegroundColor Yellow -NoNewline
+        if ($subtitlesOption) {
+            Write-Host "$subtitlesOption" -ForegroundColor Cyan
+        } else {
+            Write-Host "(Pendiente)" -ForegroundColor DarkGray
+        }
+
+        Write-Host "4. Iniciar descarga" -ForegroundColor Yellow
+        Write-Host "5. Instalar ffmpeg" -ForegroundColor Yellow
+        Write-Host "6. Salir" -ForegroundColor Yellow
         Write-Host "===========================" -ForegroundColor Green
         Write-Host "Selecciona una opcion:" -ForegroundColor Yellow
         $option = Read-Host
 
         switch ($option) {
             "1" {
-                Download-Video
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "    Ingresar URL del video   " -ForegroundColor Green
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "Ingresa la URL del video:" -ForegroundColor Yellow
+                $url = Read-Host
+
+                if ([string]::IsNullOrEmpty($url)) {
+                    Write-Host "No se ingreso ninguna URL, intenta de nuevo." -ForegroundColor Red
+                } else {
+                    Write-Host "URL ingresada: $url" -ForegroundColor Green
+                }
+
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
             }
             "2" {
-                Install-Ffmpeg
+                if (-not $url) {
+                    Write-Host "Primero debes ingresar una URL en la opcion 1." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "    Ingresar Formato del video   " -ForegroundColor Green
+                Write-Host "===========================" -ForegroundColor Green
+
+                try {
+                    yt-dlp.exe -F $url
+                } catch {
+                    Write-Host "Error al listar formatos, verifica la URL o conexion a internet." -ForegroundColor Red
+                    continue
+                }
+
+                Write-Host "Ingresa el nombre completo del formato o deja en blanco para usar el mejor video y audio combinados:" -ForegroundColor Yellow
+                $format = Read-Host
+
+                if ([string]::IsNullOrEmpty($format)) {
+                    $format = "bestvideo+bestaudio"
+                }
+
+                Write-Host "Formato seleccionado: $format" -ForegroundColor Green
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
             }
             "3" {
+                if (-not $url) {
+                    Write-Host "Primero debes ingresar una URL en la opcion 1." -ForegroundColor Red
+                    Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                    $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+                    continue
+                }
+
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "   Subtitulos Disponibles   " -ForegroundColor Magenta
+                Write-Host "===========================" -ForegroundColor Green
+
+                try {
+                    yt-dlp.exe --list-subs $url
+                } catch {
+                    Write-Host "Error al listar subtitulos, verifica la URL o conexion a internet." -ForegroundColor Red
+                    continue
+                }
+
+                Write-Host "Ingresa el codigo de idioma de los subtitulos (por ejemplo, 'es' para espanol, 'en' para ingles):" -ForegroundColor Magenta
+                $subOption = Read-Host
+
+                if ([string]::IsNullOrEmpty($subOption)) {
+                    Write-Host "No se seleccionaron subtitulos." -ForegroundColor DarkGray
+                } else {
+                    $subtitlesOption = "--write-subs --embed-subs --sub-lang $subOption"
+                    Write-Host "Subtitulo seleccionado: $subOption" -ForegroundColor Green
+                }
+
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
+            "4" {
+                if (-not $url -or -not $format) {
+                    Write-Host "Primero debes ingresar una URL y un formato." -ForegroundColor Red
+                    continue
+                }
+
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "  Iniciando Descarga  " -ForegroundColor Cyan
+                Write-Host "===========================" -ForegroundColor Green
+
+                try {
+                    Write-Host "Ejecutando: $dynamicCommand" -ForegroundColor Cyan
+                    Invoke-Expression $dynamicCommand
+                    Write-Host "Descarga completada." -ForegroundColor Green
+                } catch {
+                    Write-Host "Hubo un error al descargar el video." -ForegroundColor Red
+                }
+
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
+            "5" {
+                Install-Ffmpeg
+            }
+            "6" {
                 Exit
             }
             default {
-                Write-Host "Opcion no valida. Intentalo de nuevo." -ForegroundColor Red
+                Write-Host "Opcion no valida, intentalo de nuevo." -ForegroundColor Red
                 Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
                 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
             }
@@ -260,5 +246,5 @@ function Show-Menu {
     }
 }
 
-# Mostrar el menú principal
+# Mostrar el menu principal
 Show-Menu
