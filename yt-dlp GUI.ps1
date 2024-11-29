@@ -54,16 +54,33 @@ function Install-Ffmpeg {
 }
 
 
+Add-Type -AssemblyName System.Windows.Forms
+
+function Show-FileDialog {
+    $fileDialog = New-Object System.Windows.Forms.OpenFileDialog
+    $fileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Todos los archivos (*.*)|*.*"
+    $fileDialog.Title = "Seleccionar archivo de cookies"
+    if ($fileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+        return $fileDialog.FileName
+    }
+    return $null
+}
+
 function Show-Menu {
     $url = ""
     $format = ""
     $subtitlesOption = ""
+    $cookiesFile = ""
     $dynamicCommand = "(Pendiente)"
 
     while ($true) {
         # Actualizar el código dinámico basado en las opciones ingresadas
         if ($url -and $format) {
-            $dynamicCommand = "yt-dlp.exe -f $format $subtitlesOption $url"
+            $dynamicCommand = "yt-dlp.exe"
+            if ($cookiesFile) {
+                $dynamicCommand += " --cookies $cookiesFile"
+            }
+            $dynamicCommand += " -f $format $subtitlesOption $url"
         } else {
             $dynamicCommand = "(Pendiente)"
         }
@@ -99,6 +116,13 @@ function Show-Menu {
         Write-Host "$dynamicCommand" -ForegroundColor Cyan
         Write-Host "===========================" -ForegroundColor Green
 
+        Write-Host "0. Agregar cookies: " -ForegroundColor Yellow -NoNewline
+        if ($cookiesFile) {
+            Write-Host "$cookiesFile" -ForegroundColor Cyan
+        } else {
+            Write-Host "(Pendiente)" -ForegroundColor DarkGray
+        }
+
         Write-Host "1. Ingresar la URL del video: " -ForegroundColor Yellow -NoNewline
         if ($url) {
             Write-Host "$url" -ForegroundColor Cyan
@@ -128,6 +152,23 @@ function Show-Menu {
         $option = Read-Host
 
         switch ($option) {
+            "0" {
+                Clear-Host
+                Write-Host "===========================" -ForegroundColor Green
+                Write-Host "      Agregar Cookies       " -ForegroundColor Green
+                Write-Host "===========================" -ForegroundColor Green
+                
+                $selectedFile = Show-FileDialog
+                if ($selectedFile) {
+                    $cookiesFile = $selectedFile
+                    Write-Host "Archivo de cookies seleccionado: $cookiesFile" -ForegroundColor Green
+                } else {
+                    Write-Host "No se selecciono ningun archivo de cookies." -ForegroundColor DarkGray
+                }
+
+                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
+                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+            }
             "1" {
                 Clear-Host
                 Write-Host "===========================" -ForegroundColor Green
@@ -159,7 +200,12 @@ function Show-Menu {
                 Write-Host "===========================" -ForegroundColor Green
 
                 try {
-                    yt-dlp.exe -F $url
+                    $cmd = "yt-dlp.exe"
+                    if ($cookiesFile) {
+                        $cmd += " --cookies $cookiesFile"
+                    }
+                    $cmd += " -F $url"
+                    Invoke-Expression $cmd
                 } catch {
                     Write-Host "Error al listar formatos, verifica la URL o conexion a internet." -ForegroundColor Red
                     continue
@@ -190,7 +236,12 @@ function Show-Menu {
                 Write-Host "===========================" -ForegroundColor Green
 
                 try {
-                    yt-dlp.exe --list-subs $url
+                    $cmd = "yt-dlp.exe"
+                    if ($cookiesFile) {
+                        $cmd += " --cookies $cookiesFile"
+                    }
+                    $cmd += " --list-subs $url"
+                    Invoke-Expression $cmd
                 } catch {
                     Write-Host "Error al listar subtitulos, verifica la URL o conexion a internet." -ForegroundColor Red
                     continue
