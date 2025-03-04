@@ -17,14 +17,15 @@ Este es un script de PowerShell que facilita la instalación de `ffmpeg`, la ges
 ## 🚀 Requisitos
 
 - Windows con PowerShell instalado.
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) instalado.
+- [yt-dlp](https://pypi.org/project/yt-dlp/) instalado con python.
 - [7-Zip](https://www.7-zip.org/) para descomprimir `ffmpeg`.
 
 ## 📖 Uso
 
 1. Al ejecutar el script, se mostrará un menú interactivo.
-2. Ingresa la URL del video a través de una ventana emergente.
-3. Selecciona el formato y subtítulos según disponibilidad.
+   (Si no se ejecuta "yt-dlp GUI.ps1" ejecuta "yt-dlp GUI.bat")
+3. Ingresa la URL del video a través de una ventana emergente.
+4. Selecciona el formato y subtítulos según disponibilidad.
 5. Descarga y disfruta del contenido.
 
 ## 📝 Licencia
