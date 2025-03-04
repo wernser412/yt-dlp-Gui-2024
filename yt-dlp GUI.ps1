@@ -1,3 +1,6 @@
+Add-Type -AssemblyName Microsoft.VisualBasic
+Add-Type -AssemblyName System.Windows.Forms
+
 function Install-Ffmpeg {
     Clear-Host
     Write-Host "===========================" -ForegroundColor Green
@@ -54,8 +57,6 @@ function Install-Ffmpeg {
 }
 
 
-Add-Type -AssemblyName System.Windows.Forms
-
 function Show-FileDialog {
     $fileDialog = New-Object System.Windows.Forms.OpenFileDialog
     $fileDialog.Filter = "Archivos de texto (*.txt)|*.txt|Todos los archivos (*.*)|*.*"
@@ -68,7 +69,7 @@ function Show-FileDialog {
 
 function Show-Menu {
     $url = ""
-    $format = ""
+    $format = "bestvideo+bestaudio"
     $subtitlesOption = ""
     $cookiesFile = ""
     $dynamicCommand = "(Pendiente)"
@@ -170,21 +171,12 @@ function Show-Menu {
                 $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
             }
             "1" {
-                Clear-Host
-                Write-Host "===========================" -ForegroundColor Green
-                Write-Host "    Ingresar URL del video   " -ForegroundColor Green
-                Write-Host "===========================" -ForegroundColor Green
-                Write-Host "Ingresa la URL del video:" -ForegroundColor Yellow
-                $url = Read-Host
-
-                if ([string]::IsNullOrEmpty($url)) {
+                $url = [Microsoft.VisualBasic.Interaction]::InputBox("Ingresa la URL del video:", "Ingresar URL", "")
+                if (-not $url) {
                     Write-Host "No se ingreso ninguna URL, intenta de nuevo." -ForegroundColor Red
                 } else {
                     Write-Host "URL ingresada: $url" -ForegroundColor Green
                 }
-
-                Write-Host "Presiona cualquier tecla para continuar..." -ForegroundColor Yellow
-                $x = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
             }
             "2" {
                 if (-not $url) {
