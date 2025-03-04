@@ -1,37 +1,33 @@
 # Video Downloader con yt-dlp y PowerShell
 
-**Última Actualización:** 28 de noviembre de 2024
+**Última Actualización:** 04 de marzo de 2025
 
 ![Interfaz Gráfica del Script](GUI.png)
 
 ## Descripción
 
-Este script en PowerShell es una herramienta interactiva para descargar videos desde una URL utilizando `yt-dlp`. Permite al usuario seleccionar el formato de video/audio deseado y verifica que las dependencias necesarias (`yt-dlp` y `ffmpeg`) estén correctamente instaladas en el sistema. Además, incluye la opción para instalar `ffmpeg` automáticamente si no está presente.
+Este es un script de PowerShell que facilita la instalación de `ffmpeg`, la gestión de descargas de videos con `yt-dlp`, y permite seleccionar formatos, subtítulos y cookies.
 
-## Características
+## 📌 Características  
+- Descarga e instalación automática de `ffmpeg`.  
+- Soporte para `yt-dlp` con selección de formatos.  
+- Posibilidad de agregar cookies para descargas autenticadas.  
+- Interfaz interactiva con menú en consola. 
 
-- **Descarga de videos**: Selecciona el formato deseado o utiliza la mejor calidad de video y audio combinados automáticamente.
-- **Verificación de dependencias**: El script comprueba si `yt-dlp` y `ffmpeg` están instalados y, si no es así, te avisa.
-- **Instalación automática de `ffmpeg`**: Si `ffmpeg` no está instalado, el script lo descarga, descomprime y lo agrega al `PATH` del sistema.
-- **Menú interactivo**: Incluye un menú sencillo con opciones para descargar videos, verificar instalaciones, instalar `ffmpeg`, y salir del script.
-- **Manejo de errores**: Gestiona errores como URL no válidas, problemas de descarga, y rutas incorrectas, con mensajes claros para el usuario.
-
-## Requisitos
+## 🚀 Requisitos
 
 - Windows con PowerShell instalado.
 - [yt-dlp](https://github.com/yt-dlp/yt-dlp) instalado.
 - [7-Zip](https://www.7-zip.org/) para descomprimir `ffmpeg`.
 
-## Uso
+## 📖 Uso
 
-1. Ejecuta el script (yt-dlp GUI.bat).
-2. Selecciona la opción deseada en el menú.
-3. Ingresa la URL del video cuando se te pida.
-4. Selecciona el formato o usa la opción predeterminada.
-5. El video se descargará en la carpeta actual.
+1. Al ejecutar el script, se mostrará un menú interactivo.
+2. Ingresa la URL del video a través de una ventana emergente.
+3. Selecciona el formato y subtítulos según disponibilidad.
+5. Descarga y disfruta del contenido.
 
-## Notas
+## 📝 Licencia
 
-- El script requiere una conexión a internet para descargar `ffmpeg` si no está instalado.
-- Asegúrate de que `7-Zip` esté instalado y accesible en la ruta predeterminada (`C:\Program Files\7-Zip\7z.exe`).
+- Este proyecto está bajo la licencia MIT.
 
